@@ -21,14 +21,19 @@ impl InterParse {
     }
 
     fn peek_token(&self) -> Option<&Token> {
-        self.tokens.get(self.next)
+        match self.next < self.tokens.len() {
+            true => {
+                self.tokens.get(self.next)
+            },
+            false => None,
+        }
     }
 
     
     fn next_ind_token(&mut self) -> Option<Token> {
+        self.next += 1;
         match self.next < self.tokens.len() {
-            true => {
-                self.next += 1;
+            true => {  
                 
                 let result_token: Token = self.tokens[self.next].clone();
                 Some(result_token)
@@ -72,13 +77,17 @@ impl InterParse {
                 if let Some(Token::Indentifier(variable_name)) = self.next_ind_token() {
                     if let Some(Token::Equal) = self.next_ind_token() {
                         let expr_result: Expr = self.parse_term()?;
-                                            
-                        if let Some(Token::Semicolon) = self.next_ind_token() {
+
+                        if let Some(Token::Semicolon) = self.peek_token() {
+                            self.next_ind_token();
                             return Some(Stmt::Let(variable_name, expr_result));
                         } else {
                             let message_not_found_semicolon: &str = "[Error] - Invalid Sintaxe! Please add ; in line end.";
                             println!("{}", message_not_found_semicolon);
                         }
+                    } else {
+                        let message_not_found_equal: String = format!("[Error]- Invalid Sintaxe! Please add = in variable: {:?}!", variable_name); 
+                        println!("{:?}", &message_not_found_equal);
                     }
                 }
             },
@@ -95,20 +104,20 @@ impl InterParse {
 
         let token_ref: &Token = token_now.as_ref().unwrap();
         let mut expr: Expr = self.parse_token_for_expr(token_ref)?;
-     
+
         /*
         * ind_t: &Token
         * */
         while let Some(ind_t) = self.next_ind_token() {
-            println!("{:?}", ind_t);
+            
             let signal_operation = match ind_t {
                 Token::Plus => "+",
                 Token::Mius => "-",
                 _ => break,
             };
-            println!("first {}", &signal_operation);
+           
             self.next_ind_token();
-            println!("{}", &signal_operation);
+            
 
             if let Some(right) = self.peek_token() {
                 println!("{:?}", &right);
@@ -116,7 +125,7 @@ impl InterParse {
 
         }
 
-        
+        println!("token_now 2 {:?}", &token_now);
         Some(expr)
     }
 

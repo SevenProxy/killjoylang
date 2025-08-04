@@ -25,7 +25,7 @@ impl Eval {
             match stmt {
                 Stmt::Let(variable_name, expr_result) => {
                     let result_value: Value = self.eval_operation(&expr_result);
-                    println!("{:?}", result_value);
+                    println!("print eval {:?}", result_value);
                     self.vars.insert(variable_name, result_value);
                 },
                 Stmt::Print(print_expr) => self.eval_print(&print_expr),
