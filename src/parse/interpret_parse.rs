@@ -76,15 +76,24 @@ impl InterParse {
                 
                 if let Some(Token::Indentifier(variable_name)) = self.next_ind_token() {
                     if let Some(Token::Equal) = self.next_ind_token() {
-                        let expr_result: Expr = self.parse_term()?;
-
-                        if let Some(Token::Semicolon) = self.peek_token() {
-                            self.next_ind_token();
-                            return Some(Stmt::Let(variable_name, expr_result));
-                        } else {
-                            let message_not_found_semicolon: &str = "[Error] - Invalid Sintaxe! Please add ; in line end.";
-                            println!("{}", message_not_found_semicolon);
-                        }
+                        let expr_result: Option<Expr> = self.parse_term();
+                        
+                        match expr_result {
+                            Some(expr) => {
+                                if let Some(Token::Semicolon) = self.peek_token() {
+                                    self.next_ind_token();
+                                    return Some(Stmt::Let(variable_name, expr));
+                                } else {
+                                    let message_not_found_semicolon: &str = "[Error] - Invalid Sintaxe! Please add ; in line end.";
+                                    println!("{}", message_not_found_semicolon);
+                                }
+                            },
+                            None => {
+                                let message_not_found_expr: &str = "[Error] - INvalid Sintaxe!";
+                                println!("{}", message_not_found_expr);
+                            },
+                        };
+                        
                     } else {
                         let message_not_found_equal: String = format!("[Error]- Invalid Sintaxe! Please add = in variable: {:?}!", variable_name); 
                         println!("{:?}", &message_not_found_equal);
@@ -115,12 +124,22 @@ impl InterParse {
                 Token::Mius => "-",
                 _ => break,
             };
-           
-            self.next_ind_token();
             
-
-            if let Some(right) = self.peek_token() {
-                println!("{:?}", &right);
+            if let Some(right_token) = self.next_ind_token() {
+                let right: Option<Expr> = self.parse_token_for_expr(&right_token);
+                
+                match right {
+                    /*
+                    * Expr
+                    * */
+                    Some(r) => {
+                        expr = Expr::Binary { left: Box::new(expr), operation: signal_operation.to_string(), right: Box::new(r) }
+                    },
+                    None => return None,
+                }
+                
+            } else {
+                break;
             }
 
         }
