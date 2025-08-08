@@ -43,7 +43,7 @@ impl Eval {
             Expr::Binary { left, operation, right } => {
                 let l: Value = self.eval_operation(left);
                 let r: Value = self.eval_operation(right);
-
+                println!("eval operation {:?} {:?}", l, r);
                 match (l, r, operation.as_str()) {
                     (Value::Number(x), Value::Number(y), "*") => Value::Number(x * y),
                     (Value::Number(x), Value::Number(y), "/") => Value::Number(x / y),

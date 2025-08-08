@@ -1,1 +1,1 @@
-  armazena_robozinho nome = 10 - 5 + 5 + 5;
+armazena_robozinho nome = 10 - 5 + 5 + 10 - 20 + 5;

@@ -121,12 +121,45 @@ impl InterParse {
         * */
         while let Some(ind_t) = self.next_ind_token() {
             
-            let signal_operation = match ind_t {
+            let signal_operation: &str = match ind_t {
                 Token::Plus => "+",
                 Token::Mius => "-",
                 _ => break,
             };
             
+            let right_now: Option<Token> = self.next_ind_token();
+            if right_now.is_none() {
+                break;
+            }
+            
+            match self.parse_token_for_expr(right_now.as_ref().unwrap()) {
+                /*
+                * right_token: Expr
+                * */
+                Some(right_token) => {
+                    match signal_operation {
+                        "+" => {
+                            expr = Expr::Binary {
+                                left: Box::new(expr),
+                                operation: "+".to_string(),
+                                right: Box::new(right_token),
+                            }
+                        },
+                        "-" => {
+                            expr = Expr::Binary {
+                                left: Box::new(expr),
+                                operation: "-".to_string(),
+                                right: Box::new(right_token),
+                            }
+                        },
+                        _ => break,
+                    }
+                },
+                None => break,
+            }
+            
+
+            /*
             if let right_token = self.parse_term() {
                 println!("right {:?}", right_token);
                 match right_token {
@@ -140,7 +173,7 @@ impl InterParse {
                     None => return None,
                 }
                 
-            } else { break; }
+            } else { break; }*/
         }
 
         println!("token_now 2 {:?}", &token_now);
