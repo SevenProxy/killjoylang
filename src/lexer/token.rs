@@ -36,6 +36,10 @@ pub enum Token {
     #[regex("(true|false)", |lex| lex.slice().parse().ok())]
     Boolean(bool),
 
+    // FUNCTION
+    #[token("mostra_na_tela_robozinho")]
+    Print,
+
 
     // SCOPE
     #[token("(")]

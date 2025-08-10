@@ -1,5 +1,7 @@
+use std::clone;
+
 use crate::{
-    Expr, Stmt, Token
+    Expr, Print, Stmt, Token
 };
 
 
@@ -86,7 +88,7 @@ impl InterParse {
                                 }
                             },
                             None => {
-                                let message_not_found_expr: &str = "[Error] - INvalid Sintaxe!";
+                                let message_not_found_expr: &str = "[Error] - Invalid Sintaxe!";
                                 println!("{}", message_not_found_expr);
                             },
                         };
@@ -97,6 +99,41 @@ impl InterParse {
                     }
                 }
             },
+            Token::Print => {
+                let token_result: Option<Token> = self.next_ind_token();
+
+                match token_result {
+                    /*
+                    * token: Token
+                    * */
+                    Some(token) => {
+                        let expr_result: Option<Expr> = self.parse_token_for_expr(&token);
+
+                        match expr_result {
+                            /*
+                            * expr: Expr
+                            * */
+                            Some(expr) => {
+                                let print_function: Print = Print::Ast(expr);
+
+                                if let Some(Token::Semicolon) = self.next_ind_token() {
+                                    self.next_ind_token();
+                                    return Some(Stmt::Print(print_function));
+                                } else {
+                                    let message_not_found_semicolon: &str = "[Error] - Invalid Sintaxe! Please add ; in line end.";
+                                    println!("{}", message_not_found_semicolon);
+                                }
+                            },
+                            None => {
+                                let message_not_found_expr: &str = "[Error] - Argument invalid for function 'mostra_na_tela_robozinho'.";
+                                println!("{}", message_not_found_expr);
+                            },
+                        };
+                    },
+                    None => {},
+                }
+
+            }
             _ => {},
         }
         None
@@ -162,6 +199,7 @@ impl InterParse {
 
     fn parse_token_for_expr(&mut self, token: &Token) -> Option<Expr> {
         match token {
+            Token::Indentifier(variable_name) => Some(Expr::OtherVariable(variable_name.clone())),
             Token::Number(type_number) => Some(Expr::Number(type_number.clone())),
             Token::Str(type_string) => Some(Expr::Str(type_string.clone())),
             Token::Boolean(type_boolean) => Some(Expr::Boolean(type_boolean.clone())),
