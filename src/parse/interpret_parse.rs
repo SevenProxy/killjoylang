@@ -1,7 +1,5 @@
 use crate::{
-    Expr,
-    Stmt,
-    Token,
+    Expr, Stmt, Token
 };
 
 
@@ -72,17 +70,14 @@ impl InterParse {
 
     fn parse_stmt(&mut self) -> Option<Stmt> {
         match self.peek_token()? {
-            Token::Let => {
-                
+            Token::Let => {               
                 if let Some(Token::Indentifier(variable_name)) = self.next_ind_token() {
                     if let Some(Token::Equal) = self.next_ind_token() {
                         let expr_result: Option<Expr> = self.parse_term();
                         
                         match expr_result {
                             Some(expr) => {
-                                println!("match expr {:?}", self.peek_token());
-                                if let Some(Token::Semicolon) = self.peek_token() {
-                                    println!("match expr {:?}", expr);
+                                if let Some(Token::Semicolon) = self.peek_token() {                      
                                     self.next_ind_token();
                                     return Some(Stmt::Let(variable_name, expr));
                                 } else {
@@ -107,6 +102,7 @@ impl InterParse {
         None
     }
 
+    
     fn parse_term(&mut self) -> Option<Expr> {
         let token_now: Option<Token> = self.next_ind_token();
         if token_now.is_none() {
@@ -158,25 +154,9 @@ impl InterParse {
                 None => break,
             }
             
-
-            /*
-            if let right_token = self.parse_term() {
-                println!("right {:?}", right_token);
-                match right_token {
-                    /*
-                    * Expr
-                    * */
-                    Some(right) => {
-                        expr = Expr::Binary { left: Box::new(expr), operation: signal_operation.to_string(), right: Box::new(right) };
-                        break;
-                    },
-                    None => return None,
-                }
-                
-            } else { break; }*/
         }
 
-        println!("token_now 2 {:?}", &token_now);
+        
         Some(expr)
     }
 
@@ -185,6 +165,28 @@ impl InterParse {
             Token::Number(type_number) => Some(Expr::Number(type_number.clone())),
             Token::Str(type_string) => Some(Expr::Str(type_string.clone())),
             Token::Boolean(type_boolean) => Some(Expr::Boolean(type_boolean.clone())),
+            Token::LParen => {
+                let expr_result: Option<Expr> = self.parse_term();
+
+                match expr_result {
+                    /*
+                    * expr: Expr
+                    * */
+                    Some(expr) => {
+                        match self.peek_token() {
+                            /*
+                            * token: &Token
+                            * */
+                            Some(token) => match token {
+                                Token::RParen => Some(expr),
+                                _ => Some(expr),
+                            },
+                            None => Some(expr),
+                        } 
+                    },
+                    None => None,
+                }
+            },
             _ => None,
         }
     }

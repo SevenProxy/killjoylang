@@ -25,7 +25,7 @@ impl Eval {
             match stmt {
                 Stmt::Let(variable_name, expr_result) => {
                     let result_value: Value = self.eval_operation(&expr_result);
-                    println!("print eval {:?}", result_value);
+
                     self.vars.insert(variable_name, result_value);
                 },
                 Stmt::Print(print_expr) => self.eval_print(&print_expr),
@@ -43,7 +43,7 @@ impl Eval {
             Expr::Binary { left, operation, right } => {
                 let l: Value = self.eval_operation(left);
                 let r: Value = self.eval_operation(right);
-                println!("eval operation {:?} {:?}", l, r);
+                
                 match (l, r, operation.as_str()) {
                     (Value::Number(x), Value::Number(y), "*") => Value::Number(x * y),
                     (Value::Number(x), Value::Number(y), "/") => Value::Number(x / y),

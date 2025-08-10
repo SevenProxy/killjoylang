@@ -37,6 +37,11 @@ pub enum Token {
     Boolean(bool),
 
 
+    // SCOPE
+    #[token("(")]
+    LParen,
+    #[token(")")]
+    RParen,
     
     // SYMBOLS
     #[token("=")]
