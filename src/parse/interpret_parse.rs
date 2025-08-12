@@ -148,7 +148,6 @@ impl InterParse {
 
         let token_ref: &Token = token_now.as_ref().unwrap();
         let mut expr: Expr = self.parse_token_for_expr(token_ref)?;
-
         /*
         * ind_t: &Token
         * */
@@ -157,6 +156,8 @@ impl InterParse {
             let signal_operation: &str = match ind_t {
                 Token::Plus => "+",
                 Token::Mius => "-",
+                Token::Star => "*",
+                Token::Slash => "/",
                 _ => break,
             };
             
@@ -171,6 +172,57 @@ impl InterParse {
                 * */
                 Some(right_token) => {
                     match signal_operation {
+                        "/" => {
+                            match expr {
+                                Expr::Binary { left, operation, right } => {
+                                    let left_sum: Expr = Expr::Binary {
+                                        left: right,
+                                        operation: "/".to_string(),
+                                        right: Box::new(right_token),
+                                    };
+
+                                    expr = Expr::Binary {
+                                        left: left,
+                                        operation: operation,
+                                        right: Box::new(left_sum),
+                                    }
+                                },
+                                Expr::Number(number_value) => {
+                                    expr = Expr::Binary {
+                                        left: Box::new(Expr::Number(number_value)),
+                                        operation: "/".to_string(),
+                                        right: Box::new(right_token),
+                                    }
+                                }
+                                _ => break,
+                            }
+                        },
+                        "*" => {
+                            match expr {
+                                Expr::Binary { left, operation, right} => {
+                                    let left_sum: Expr = Expr::Binary {
+                                        left: right,
+                                        operation: "*".to_string(),
+                                        right: Box::new(right_token),
+                                    };
+
+                                    expr = Expr::Binary {
+                                        left: left,
+                                        operation: operation,
+                                        right: Box::new(left_sum),
+                                    }
+                                    
+                                },
+                                Expr::Number(number_value) => {
+                                    expr = Expr::Binary {
+                                        left: Box::new(Expr::Number(number_value)),
+                                        operation: "*".to_string(),
+                                        right: Box::new(right_token),
+                                    }
+                                },
+                                _ => break,
+                            }
+                        },
                         "+" => {
                             expr = Expr::Binary {
                                 left: Box::new(expr),
@@ -196,6 +248,7 @@ impl InterParse {
         
         Some(expr)
     }
+
 
     fn parse_token_for_expr(&mut self, token: &Token) -> Option<Expr> {
         match token {
