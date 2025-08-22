@@ -133,12 +133,87 @@ impl InterParse {
                     None => {},
                 }
 
-            }
+            },
+            Token::If => {
+                let l_paren: Option<Token> = self.next_ind_token();
+
+                match l_paren {
+                    Some(_token) => {
+                        let condition_result: Expr = self.parse_term()?;
+
+                        match condition_result {
+                            Expr::Boolean(_) => {},
+                            _ => {
+                                let message_condition_invalid: &str = "[Error] - Invalid Condition.";
+                                println!("{}", message_condition_invalid);
+                                return None
+                            },
+                        }
+                        
+                        if let Some(Token::RParen) = self.peek_token() {
+                            if let Some(Token::LBrace) = self.next_ind_token() {
+                                let then_branch: Vec<Stmt> = self.parse_block()?;
+
+
+                                match self.peek_token() == Some(&Token::RBrace) {
+                                    true => {
+                                        let else_branch = if self.next_ind_token() == Some(Token::Else) {
+                                            if self.next_ind_token() != Some(Token::LBrace) {
+                                                let messege_not_found_lbrance: &str = "[Error] - Invalid Sintaxe. Please add '{' in lien end.";
+                                                println!("{}", messege_not_found_lbrance);
+                                                return None;
+                                            }
+                                            Some(self.parse_block()?)
+
+                                        } else {
+                                            None
+                                        };
+
+                                        return Some(Stmt::If {
+                                            condition: condition_result,
+                                            then_branch: then_branch,
+                                            else_branch: else_branch,
+                                        });
+                                    },
+                                    false => {
+                                        let message_not_found_rbrace: &str = "[Error] - Invalid Sintaxe. Please add '}' in line end.";
+                                        println!("{}", message_not_found_rbrace);
+                                    }
+                                }
+                            } else {
+                                let message_not_found_brance: &str = "[Error] - Invalid Sintaxe!";
+                                println!("{}", message_not_found_brance);
+                            }
+                        } else {
+                            let message_not_found_expr: &str = "[Error] - Invalid Sintaxe! Please add ) in line end.";
+                            println!("{}", message_not_found_expr);
+                        }
+                        
+                    },
+                    None => {
+                        let message_invalid_sintaxe: &str = "[Error] - Invalid Sintaxe!";
+                        println!("{}", message_invalid_sintaxe);
+                    },
+                }
+            },
             _ => {},
         }
         None
     }
 
+    fn parse_block(&mut self) -> Option<Vec<Stmt>> {
+        let mut stmts = Vec::new();
+        
+        while let Some(tok) = self.peek_token() {
+            if *tok == Token::RBrace {
+                break;
+            }
+            self.next_ind_token();
+            stmts.push(self.parse_stmt()?);
+        }
+
+        Some(stmts)
+    }
     
     fn parse_term(&mut self) -> Option<Expr> {
         let token_now: Option<Token> = self.next_ind_token();
@@ -158,8 +233,11 @@ impl InterParse {
                 Token::Mius => "-",
                 Token::Star => "*",
                 Token::Slash => "/",
+                Token::TwoEqual => "==",
+                
                 _ => break,
             };
+            
             
             let right_now: Option<Token> = self.next_ind_token();
             if right_now.is_none() {
@@ -172,6 +250,13 @@ impl InterParse {
                 * */
                 Some(right_token) => {
                     match signal_operation {
+                        "==" => {
+                            if right_token == expr {
+                                expr = Expr::Boolean(true)
+                            } else {
+                                expr = Expr::Boolean(false)
+                            }
+                        },
                         "/" => {
                             match expr {
                                 Expr::Binary { left, operation, right } => {

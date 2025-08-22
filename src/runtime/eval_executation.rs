@@ -29,7 +29,54 @@ impl Eval {
                     self.vars.insert(variable_name, result_value);
                 },
                 Stmt::Print(print_expr) => self.eval_print(&print_expr),
+                Stmt::If { condition, then_branch, else_branch } => {
+                    let cond_val: Value = self.eval_operation(&condition);
+
+                    if Value::Boolean(true) == cond_val {
+                        for block_stmt in then_branch{
+                            self.eval_block(block_stmt);
+                        }
+                    } else {
+                        match else_branch {
+                            Some(e_branch) => {
+                                for block_else in e_branch {
+                                    self.eval_block(block_else);
+                                }
+                            },
+                            None => {},
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    fn eval_block(&mut self, branch: Stmt) {
+        match branch {
+            Stmt::Let(variable_name, expr_result) => {
+                let result_value: Value = self.eval_operation(&expr_result);
+
+                self.vars.insert(variable_name, result_value);
+            },
+            Stmt::Print(print_expr) => self.eval_print(&print_expr),
+            Stmt::If { condition, then_branch, else_branch } => {
+                let cond_val: Value = self.eval_operation(&condition);
+
+                if Value::Boolean(true) == cond_val {
+                    for block_stmt in then_branch {
+                        self.eval_block(block_stmt);
+                    }
+                } else {
+                    match else_branch {
+                        Some(e_branch) => {
+                            for block_else in e_branch {
+                                self.eval_block(block_else);
+                            }
+                        },
+                        None => {},
+                    }
+                }
+            },
         }
     }
 

@@ -10,9 +10,15 @@ pub enum Token {
     #[regex("//[^\n]*", logos::skip)]
     Comment,
 
-    // LET
+    // RESERVERD WORDS
     #[token("armazena_robozinho")]
     Let,
+
+    #[token("se_encontrou")]
+    If,
+
+    #[token("alarmobo_destruido")]
+    Else,
 
 
     // VARIABLE NAME
@@ -46,6 +52,10 @@ pub enum Token {
     LParen,
     #[token(")")]
     RParen,
+    #[token("{")]
+    LBrace,
+    #[token("}")]
+    RBrace,
     
     // SYMBOLS
     #[token("=")]
@@ -60,4 +70,6 @@ pub enum Token {
     Slash,
     #[token(";")]
     Semicolon,
+    #[token("==")]
+    TwoEqual,
 }
