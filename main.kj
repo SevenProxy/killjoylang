@@ -2,6 +2,9 @@ armazena_robozinho nome = 4 / 2;
 
 mostra_na_tela_robozinho nome;
 
-se_encontrou (nome == nome) {
+se_encontrou (nome == "texto") {
   mostra_na_tela_robozinho "encontrou";
+} 
+alarmobo_destruido {
+  mostra_na_tela_robozinho "else validado";
 }

@@ -159,11 +159,19 @@ impl InterParse {
                                     true => {
                                         let else_branch = if self.next_ind_token() == Some(Token::Else) {
                                             if self.next_ind_token() != Some(Token::LBrace) {
-                                                let messege_not_found_lbrance: &str = "[Error] - Invalid Sintaxe. Please add '{' in lien end.";
-                                                println!("{}", messege_not_found_lbrance);
+                                                let messege_not_found_lbrace: &str = "[Error] - Invalid Sintaxe. Please add '{' in line end.";
+                                                println!("{}", messege_not_found_lbrace);
                                                 return None;
                                             }
-                                            Some(self.parse_block()?)
+
+                                            let else_result: Vec<Stmt> = self.parse_block()?;
+                                            
+                                            if self.peek_token() != Some(&Token::RBrace) {
+                                                let message_not_found_rbrace: &str = "[Error] - Invalid Sintaxe. Please add '}' in line end.";
+                                                println!("{}", message_not_found_rbrace);
+                                                return None;
+                                            }
+                                            Some(else_result)
 
                                         } else {
                                             None
