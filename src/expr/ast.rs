@@ -1,6 +1,6 @@
 
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum Expr {
     Number(i64),
     Str(String),

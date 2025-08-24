@@ -189,8 +189,8 @@ impl InterParse {
                                     }
                                 }
                             } else {
-                                let message_not_found_brance: &str = "[Error] - Invalid Sintaxe!";
-                                println!("{}", message_not_found_brance);
+                                let message_not_found_brace: &str = "[Error] - Invalid Sintaxe!";
+                                println!("{}", message_not_found_brace);
                             }
                         } else {
                             let message_not_found_expr: &str = "[Error] - Invalid Sintaxe! Please add ) in line end.";
@@ -242,7 +242,8 @@ impl InterParse {
                 Token::Star => "*",
                 Token::Slash => "/",
                 Token::TwoEqual => "==",
-                
+                Token::NotEqual => "!=",
+                Token::GreaterThan => ">",
                 _ => break,
             };
             
@@ -258,6 +259,20 @@ impl InterParse {
                 * */
                 Some(right_token) => {
                     match signal_operation {
+                        ">" => {
+                            if expr > right_token {
+                                expr = Expr::Boolean(true)
+                            } else {
+                                expr = Expr::Boolean(false)
+                            }
+                        },
+                        "!=" => {
+                            if right_token != expr {
+                                expr = Expr::Boolean(true)
+                            } else {
+                                expr = Expr::Boolean(false)
+                            }
+                        },
                         "==" => {
                             if right_token == expr {
                                 expr = Expr::Boolean(true)

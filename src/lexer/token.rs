@@ -72,4 +72,12 @@ pub enum Token {
     Semicolon,
     #[token("==")]
     TwoEqual,
+    #[token("!=")]
+    NotEqual,
+    #[token(">")]
+    GreaterThan,
+    #[token("<")]
+    LessThan,
+    #[token(">=")]
+    GreaterOrEqual,
 }
